@@ -1,18 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:noviindus_test/core/color_pallette/color_pallete.dart';
 import 'package:noviindus_test/core/utils/app_text.dart';
+import 'package:noviindus_test/features/home/model/patient_model.dart';
 import 'package:noviindus_test/features/home/view/widgets/icon_text.dart';
 
 class PatientCard extends StatefulWidget {
-  const PatientCard({super.key});
+  final Patient patient;
+  final int index;
+  const PatientCard({super.key, required this.patient, required this.index});
 
   @override
   State<PatientCard> createState() => _PatientCardState();
 }
 
 class _PatientCardState extends State<PatientCard> {
+  List<String> treatments = [];
+  @override
+  void initState() {
+    widget.patient.patientDetailsSet?.map((e) =>z treatments.add(e.treatment.toString()));
+    // TODO: implement initState
+    print(treatments);
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
+
     return Container(
       height: 150,
       width: double.infinity,
@@ -30,7 +42,7 @@ class _PatientCardState extends State<PatientCard> {
                 SizedBox(
                   width: 30,
                   child: AppText(
-                      text: '1.',
+                      text: '${widget.index + 1}',
                       textStyle: Theme.of(context).textTheme.titleMedium),
                 ),
                 Expanded(
@@ -38,29 +50,29 @@ class _PatientCardState extends State<PatientCard> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       AppText(
-                          text: 'Vikram Singh',
+                          text: widget.patient.name ?? '',
                           textStyle: Theme.of(context).textTheme.titleMedium),
-                      SizedBox(
+                      const SizedBox(
                         height: 5,
                       ),
                       AppText(
-                        text: 'Couple Combo Package (Rejuven...',
+                        text: treatments.join(','),
                         textStyle: Theme.of(context).textTheme.bodyMedium,
                         textColor: ColorPallete.themeColor,
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 5,
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           IconText(
-                              text: '31/02/2023',
+                              text: widget.patient.dateNdTime.toString().split(' ').first,
                               icon: Icons.calendar_month_outlined),
-                          SizedBox(
+                          const SizedBox(
                             width: 40,
                           ),
-                          IconText(text: 'Jithesh', icon: Icons.group_outlined)
+                          IconText(text: widget.patient.user?? '', icon: Icons.group_outlined)
                         ],
                       )
                     ],
@@ -82,7 +94,7 @@ class _PatientCardState extends State<PatientCard> {
                 AppText(
                     text: 'View Booking Details',
                     textStyle: Theme.of(context).textTheme.bodyMedium),
-                Icon(
+                const Icon(
                   Icons.arrow_forward_ios_rounded,
                   color: ColorPallete.themeColor,
                   size: 18,

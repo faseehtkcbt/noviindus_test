@@ -3,6 +3,8 @@ import 'package:noviindus_test/config/routers/routers.dart';
 import 'package:noviindus_test/core/color_pallette/color_pallete.dart';
 import 'package:noviindus_test/core/utils/app_text.dart';
 import 'package:noviindus_test/features/home/view/widgets/patient_card.dart';
+import 'package:noviindus_test/features/home/view_model/home_view_model.dart';
+import 'package:provider/provider.dart';
 
 class Homescreen extends StatefulWidget {
   const Homescreen({super.key});
@@ -12,6 +14,15 @@ class Homescreen extends StatefulWidget {
 }
 
 class _HomescreenState extends State<Homescreen> {
+  @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<HomeViewModel>().getPatients();
+    });
+    // TODO: implement initState
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -62,19 +73,43 @@ class _HomescreenState extends State<Homescreen> {
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(20),
-                child: ListView.separated(
-                  itemCount: 10,
-                  shrinkWrap: true,
-                  physics: const BouncingScrollPhysics(),
-                  itemBuilder: (context, index) {
-                    return PatientCard();
-                  },
-                  separatorBuilder: (BuildContext context, int index) {
-                    return const SizedBox(
-                      height: 10,
+                child: Consumer<HomeViewModel>(builder: (context, home, child) {
+                  if (home.isLoaded == true) {
+                    return ListView.separated(
+                      itemCount: 10,
+                      shrinkWrap: true,
+                      physics: const BouncingScrollPhysics(),
+                      itemBuilder: (context, index) {
+                        return PatientCard(patient: home.patients![index], index: index,);
+                      },
+                      separatorBuilder: (BuildContext context, int index) {
+                        return const SizedBox(
+                          height: 10,
+                        );
+                      },
                     );
-                  },
-                ),
+                  } else if (home.isError == true) {
+                    WidgetsBinding.instance.addPostFrameCallback((_){
+                      ScaffoldMessenger.of(context)
+                        ..hideCurrentSnackBar()
+                        ..showSnackBar(SnackBar(
+                            content: AppText(
+                                text: home.error ?? "",
+                                textStyle:
+                                Theme.of(context).textTheme.bodySmall,textColor: ColorPallete.whiteColor,)));
+                    });
+                    return AppText(
+                        text: 'Something Went Wrong',
+                        textStyle: Theme.of(context).textTheme.bodyMedium);
+                  }
+                  else{
+                    return const Center(
+                      child: CircularProgressIndicator(
+                        color: ColorPallete.themeColor,
+                      ),
+                    );
+                  }
+                }),
               ),
             )
           ],
