@@ -12,20 +12,24 @@ class AppTextFormField extends StatefulWidget {
   void Function(String)? onChanged;
   void Function(String)? onFieldSubmitted;
   Pattern? filterPattern;
+  final int maxLines;
+  final bool readOnly;
   final AutovalidateMode autovalidateMode;
   AppTextFormField(
       {super.key,
-        required this.controller,
-        this.suffixIcon,
-        required this.hintText,
-        this.textInputType = TextInputType.text,
-        this.textCapitalization = TextCapitalization.none,
-        this.validator,
-        this.onChanged,
-        this.onFieldSubmitted,
-        this.autovalidateMode = AutovalidateMode.disabled,
-        this.filterPattern,
-        this.isObscure = false});
+      required this.controller,
+      this.suffixIcon,
+      required this.hintText,
+      this.textInputType = TextInputType.text,
+      this.textCapitalization = TextCapitalization.none,
+      this.validator,
+      this.onChanged,
+      this.onFieldSubmitted,
+      this.autovalidateMode = AutovalidateMode.disabled,
+      this.filterPattern,
+      this.maxLines = 1,
+      this.isObscure = false,
+      this.readOnly = false});
 
   @override
   State<AppTextFormField> createState() => _AppTextFormFieldState();
@@ -35,6 +39,7 @@ class _AppTextFormFieldState extends State<AppTextFormField> {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      readOnly: widget.readOnly,
       controller: widget.controller,
       obscureText: widget.isObscure,
       style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 14),
@@ -46,6 +51,7 @@ class _AppTextFormFieldState extends State<AppTextFormField> {
       onChanged: widget.onChanged,
       onFieldSubmitted: widget.onFieldSubmitted,
       autovalidateMode: widget.autovalidateMode,
+      maxLines: widget.maxLines,
       inputFormatters: [
         FilteringTextInputFormatter.allow(
           widget.filterPattern ?? RegExp(r"""

@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:noviindus_test/core/color_pallette/color_pallete.dart';
 import 'package:noviindus_test/core/constants/constants.dart';
 import 'package:noviindus_test/core/utils/app_text.dart';
 import 'package:noviindus_test/core/utils/app_text_form.dart';
+import 'package:noviindus_test/features/auth/view_model/auth_view_model.dart';
+import 'package:provider/provider.dart';
 
-import '../../../core/utils/email_validation.dart';
+import '../../../config/routers/routers.dart';
 
 class SignIn extends StatefulWidget {
   const SignIn({super.key});
@@ -20,29 +23,48 @@ class _SignInState extends State<SignIn> {
   Widget build(BuildContext context) {
     return Scaffold(
       bottomNavigationBar: Container(
-        padding: EdgeInsets.only(left: 25,right: 25),
+        padding: const EdgeInsets.only(left: 25, right: 25),
         width: double.infinity,
         height: 60,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: [AppText(text: 'By creating or logging into an account you are agreeing', textStyle: Theme.of(context).textTheme.bodySmall),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              AppText(text: 'with our ', textStyle: Theme.of(context).textTheme.bodySmall,),
-              AppText(text: 'Terms and Conditions', textStyle: Theme.of(context).textTheme.bodySmall,textColor: Colors.blueAccent,fontWeight: FontWeight.w500,),
-              AppText(text: ' and ', textStyle: Theme.of(context).textTheme.bodySmall),
-              AppText(text: 'Privacy Policy.', textStyle: Theme.of(context).textTheme.bodySmall,textColor: Colors.blueAccent,fontWeight: FontWeight.w500,),
-            ],
-            //Terms and Conditions
-          )],
+          children: [
+            AppText(
+                text: 'By creating or logging into an account you are agreeing',
+                textStyle: Theme.of(context).textTheme.bodySmall),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                AppText(
+                  text: 'with our ',
+                  textStyle: Theme.of(context).textTheme.bodySmall,
+                ),
+                AppText(
+                  text: 'Terms and Conditions',
+                  textStyle: Theme.of(context).textTheme.bodySmall,
+                  textColor: Colors.blueAccent,
+                  fontWeight: FontWeight.w500,
+                ),
+                AppText(
+                    text: ' and ',
+                    textStyle: Theme.of(context).textTheme.bodySmall),
+                AppText(
+                  text: 'Privacy Policy.',
+                  textStyle: Theme.of(context).textTheme.bodySmall,
+                  textColor: Colors.blueAccent,
+                  fontWeight: FontWeight.w500,
+                ),
+              ],
+              //Terms and Conditions
+            )
+          ],
         ),
       ),
       body: SafeArea(
           child: SingleChildScrollView(
-            physics: BouncingScrollPhysics(),
-            child: Column(
-                    children: [
+        physics: const BouncingScrollPhysics(),
+        child: Column(
+          children: [
             Container(
               width: double.infinity,
               height: 200,
@@ -112,22 +134,64 @@ class _SignInState extends State<SignIn> {
                         textInputType: TextInputType.visiblePassword,
                         isObscure: true,
                         autovalidateMode: AutovalidateMode.onUserInteraction,
-                        controller: pswdController, hintText: 'Enter password'),
+                        controller: pswdController,
+                        hintText: 'Enter password'),
                     const SizedBox(
                       height: 30,
                     ),
-                    ElevatedButton(onPressed: (){
-                      if(formKey.currentState!.validate()){
-                        
-                      }
-                    }, child:AppText(text: 'Login', textStyle: Theme.of(context).textTheme.titleMedium,textColor: Colors.white,))
+                    Consumer<AuthViewModel>(
+                        builder: (context, provider, child) {
+                      return ElevatedButton(
+                          onPressed: provider.isLoading == true
+                              ? () {}
+                              : () {
+                                  if (formKey.currentState!.validate()) {
+                                    context
+                                        .read<AuthViewModel>()
+                                        .login(
+                                            email: emailController.text.trim(),
+                                            password:
+                                                pswdController.text.trim())
+                                        .then((value) {
+                                      if (provider.isError == true &&
+                                          provider.isLoading == false) {
+                                        ScaffoldMessenger.of(context)
+                                          ..hideCurrentSnackBar()
+                                          ..showSnackBar(SnackBar(
+                                              content: AppText(
+                                            text: provider.error ?? "",
+                                            textStyle: Theme.of(context)
+                                                .textTheme
+                                                .bodySmall,
+                                            textColor: ColorPallete.whiteColor,
+                                          )));
+                                      } else {
+                                        Navigator.pushNamedAndRemoveUntil(
+                                            context,
+                                            Routers.homeScreen,
+                                            (listen) => false);
+                                      }
+                                    });
+                                  }
+                                },
+                          child: provider.isLoading == true
+                              ? const CircularProgressIndicator(
+                                  color: ColorPallete.whiteColor,
+                                )
+                              : AppText(
+                                  text: 'Login',
+                                  textStyle:
+                                      Theme.of(context).textTheme.titleMedium,
+                                  textColor: Colors.white,
+                                ));
+                    })
                   ],
                 ),
               ),
             )
-                    ],
-                  ),
-          )),
+          ],
+        ),
+      )),
     );
   }
 }

@@ -4,7 +4,7 @@ import 'package:noviindus_test/core/api_constants/api_constants.dart';
 import 'package:noviindus_test/core/internet/connection_checker.dart';
 import 'package:noviindus_test/features/auth/model/login_response.dart';
 import 'package:http/http.dart' as http;
-import '../../../core/failure/failure.dart';
+import '../../../../core/failure/failure.dart';
 
 class AuthRepository {
   Future<Either<Failure, LoginResponse>> login(
