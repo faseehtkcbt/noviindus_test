@@ -6,6 +6,7 @@ import 'package:noviindus_test/core/utils/app_text.dart';
 import 'package:noviindus_test/core/utils/app_text_form.dart';
 import 'package:noviindus_test/features/patient/view/widget/add_treatment_button.dart';
 import 'package:noviindus_test/features/patient/view_model/branch_view_model.dart';
+import 'package:noviindus_test/features/patient/view_model/treatment_view_model.dart';
 import 'package:provider/provider.dart';
 
 class AddPatientScreen extends StatefulWidget {
@@ -34,6 +35,7 @@ class _AddPatientScreenState extends State<AddPatientScreen> {
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<BranchViewModel>().getBranches();
+      context.read<TreatmentViewModel>().getTreatments();
     });
     // TODO: implement initState
     super.initState();
@@ -86,7 +88,8 @@ class _AddPatientScreenState extends State<AddPatientScreen> {
                         children: [
                           AppText(
                               text: 'Name',
-                              textStyle: Theme.of(context).textTheme.titleSmall),
+                              textStyle:
+                                  Theme.of(context).textTheme.titleSmall),
                           AppTextFormField(
                             controller: usernameController,
                             hintText: 'Enter your full name',
@@ -103,10 +106,12 @@ class _AddPatientScreenState extends State<AddPatientScreen> {
                           ),
                           AppText(
                               text: 'Whatsapp Number',
-                              textStyle: Theme.of(context).textTheme.titleSmall),
+                              textStyle:
+                                  Theme.of(context).textTheme.titleSmall),
                           AppTextFormField(
                             controller: phoneController,
-                            autovalidateMode: AutovalidateMode.onUserInteraction,
+                            autovalidateMode:
+                                AutovalidateMode.onUserInteraction,
                             hintText: 'Enter your whatsapp number',
                             textInputType: TextInputType.phone,
                             validator: (value) {
@@ -123,7 +128,8 @@ class _AddPatientScreenState extends State<AddPatientScreen> {
                           ),
                           AppText(
                               text: 'Address',
-                              textStyle: Theme.of(context).textTheme.titleSmall),
+                              textStyle:
+                                  Theme.of(context).textTheme.titleSmall),
                           AppTextFormField(
                             controller: addressController,
                             hintText: 'Enter your address',
@@ -141,7 +147,8 @@ class _AddPatientScreenState extends State<AddPatientScreen> {
                           ),
                           AppText(
                               text: 'Locations',
-                              textStyle: Theme.of(context).textTheme.titleSmall),
+                              textStyle:
+                                  Theme.of(context).textTheme.titleSmall),
                           AppDropTextForm(
                             dropDownList: AppConstants.locations,
                             onChanged: (String? newValue) {
@@ -196,27 +203,59 @@ class _AddPatientScreenState extends State<AddPatientScreen> {
                           ),
                           AppText(
                               text: 'Treatments',
-                              textStyle: Theme.of(context).textTheme.titleSmall),
-                          AddTreatmentButton(
-                            addFunction: () {
-                              showModalBottomSheet(
-                                  context: context,
-                                  builder: (context) {
-                                    return Container(
-                                      padding: const EdgeInsets.all(15),
-                                      height: 450,
-                                    );
-                                  },
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(20)));
-                            },
+                              textStyle:
+                                  Theme.of(context).textTheme.titleSmall),
+                          Consumer<TreatmentViewModel>(
+                            builder: (context,treatments,child) {
+                              return AddTreatmentButton(
+                                addFunction: () {
+                                  showModalBottomSheet(
+                                    context: context,
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                                    builder: (BuildContext context) {
+                                      return Container(
+                                        height: 450,
+                                        padding: EdgeInsets.all(16.0),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              'Persistent Bottom Sheet',
+                                              style: TextStyle(
+                                                fontSize: 24,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            SizedBox(height: 10),
+                                            AppDropTextForm(
+                                                hintText: 'hello',
+                                                dropDownList: treatments.treatments!.map((e)=>e.name.substring(start)).toList(),
+                                                onChanged: (value) {}),
+                                            Text(
+                                                'This is a persistent bottom sheet.'),
+                                            ElevatedButton(
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                              },
+                                              child: Text('Close'),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    },
+                                  );
+                                },
+                              );
+                            }
                           ),
                           const SizedBox(
                             height: 5,
                           ),
                           AppText(
                               text: 'Total Amount',
-                              textStyle: Theme.of(context).textTheme.titleSmall),
+                              textStyle:
+                                  Theme.of(context).textTheme.titleSmall),
                           AppTextFormField(
                             controller: totalAmountController,
                             hintText: 'Total Amount to pay',
@@ -227,7 +266,8 @@ class _AddPatientScreenState extends State<AddPatientScreen> {
                           ),
                           AppText(
                               text: 'Discount Amount',
-                              textStyle: Theme.of(context).textTheme.titleSmall),
+                              textStyle:
+                                  Theme.of(context).textTheme.titleSmall),
                           AppTextFormField(
                             controller: discountAmountController,
                             hintText: 'Discount Amount',
@@ -238,7 +278,8 @@ class _AddPatientScreenState extends State<AddPatientScreen> {
                           ),
                           AppText(
                               text: 'Advance Amount',
-                              textStyle: Theme.of(context).textTheme.titleSmall),
+                              textStyle:
+                                  Theme.of(context).textTheme.titleSmall),
                           AppTextFormField(
                             controller: advanceAmountController,
                             hintText: 'Enter advance amount wish to pay',
@@ -255,7 +296,8 @@ class _AddPatientScreenState extends State<AddPatientScreen> {
                           ),
                           AppText(
                               text: 'Balance Amount',
-                              textStyle: Theme.of(context).textTheme.titleSmall),
+                              textStyle:
+                                  Theme.of(context).textTheme.titleSmall),
                           AppTextFormField(
                             controller: balanceAmountController,
                             hintText: 'Balance Amount to pay',
@@ -266,7 +308,8 @@ class _AddPatientScreenState extends State<AddPatientScreen> {
                           ),
                           AppText(
                               text: 'Treatment Date',
-                              textStyle: Theme.of(context).textTheme.titleSmall),
+                              textStyle:
+                                  Theme.of(context).textTheme.titleSmall),
                           AppTextFormField(
                             controller: treatmentDateController,
                             hintText: 'Choose a date',
@@ -296,7 +339,8 @@ class _AddPatientScreenState extends State<AddPatientScreen> {
                           ),
                           AppText(
                               text: 'Treatment Time (24 hrs)',
-                              textStyle: Theme.of(context).textTheme.titleSmall),
+                              textStyle:
+                                  Theme.of(context).textTheme.titleSmall),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -305,7 +349,9 @@ class _AddPatientScreenState extends State<AddPatientScreen> {
                                 child: AppDropTextForm(
                                     hintText: 'Hour',
                                     dropDownList: List.generate(
-                                        24, (index) => index.toString().padLeft(2, '0')),
+                                        24,
+                                        (index) =>
+                                            index.toString().padLeft(2, '0')),
                                     onChanged: (value) {
                                       selectedHour = value;
                                     }),
@@ -315,7 +361,9 @@ class _AddPatientScreenState extends State<AddPatientScreen> {
                                 child: AppDropTextForm(
                                     hintText: 'Minute',
                                     dropDownList: List.generate(
-                                        60, (index) => index.toString().padLeft(2, '0')),
+                                        60,
+                                        (index) =>
+                                            index.toString().padLeft(2, '0')),
                                     onChanged: (value) {
                                       selectedMinute = value;
                                     }),
@@ -327,7 +375,7 @@ class _AddPatientScreenState extends State<AddPatientScreen> {
                           ),
                           ElevatedButton(
                               onPressed: () {
-                                if(formKey.currentState!.validate()){}
+                                if (formKey.currentState!.validate()) {}
                               },
                               child: AppText(
                                 text: 'Save',
