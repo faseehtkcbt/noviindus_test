@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:noviindus_test/core/color_pallette/color_pallete.dart';
 import 'package:noviindus_test/core/constants/constants.dart';
 import 'package:noviindus_test/core/utils/app_drop_text_form.dart';
@@ -12,6 +13,9 @@ import 'package:noviindus_test/features/patient/view_model/register_patient_view
 import 'package:noviindus_test/features/patient/view_model/treatment_view_model.dart';
 import 'package:provider/provider.dart';
 
+import '../../../config/routers/routers.dart';
+import '../../../core/radio_provider/radio_provider.dart';
+import '../model/branch_model.dart';
 import '../model/treatment_data.dart';
 
 class AddPatientScreen extends StatefulWidget {
@@ -37,6 +41,19 @@ class _AddPatientScreenState extends State<AddPatientScreen> {
   String? selectedMinute;
   DateTime? selectedDate;
   int totalCount = 0;
+  String payment = 'Card';
+
+  Branch getBranch(String value) {
+    List<Branch>? result = context.read<BranchViewModel>().branches;
+    var data;
+    for (var i in result!) {
+      if (i.name.contains(value)) {
+        data = i;
+      }
+    }
+    return data;
+  }
+
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -68,6 +85,20 @@ class _AddPatientScreenState extends State<AddPatientScreen> {
     return Column(
       children: treatmentCards,
     );
+  }
+
+  String getDateTime(DateTime date, int hour, int min) {
+    // Create a new DateTime object with the provided hour and minute
+    DateTime newDateTime = DateTime(date.year, date.month, date.day, hour, min);
+
+    // Format the date part as 'MM/dd/yyyy'
+    String formattedDate = DateFormat('MM/dd/yyyy').format(newDateTime);
+
+    // Format the time part as 'hh:mm a' (12-hour format with AM/PM)
+    String formattedTime = DateFormat('hh:mm a').format(newDateTime);
+
+    // Combine both parts
+    return '$formattedDate-$formattedTime';
   }
 
   @override
@@ -283,6 +314,85 @@ class _AddPatientScreenState extends State<AddPatientScreen> {
                               height: 5,
                             ),
                             AppText(
+                                text: 'Payment',
+                                textStyle:
+                                    Theme.of(context).textTheme.titleSmall),
+                            ChangeNotifierProvider<RadioProvider>(
+                              create: (context) => RadioProvider(),
+                              child: Consumer<RadioProvider>(
+                                  builder: (context, radio, child) {
+                                return Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    SizedBox(
+                                      height: 50,
+                                      width: size.width * 0.5,
+                                      child: RadioListTile(
+                                          selected: radio.value == 'Cash',
+                                          value: 'Cash',
+                                          title: AppText(
+                                            text: 'Cash',
+                                            textStyle: Theme.of(context)
+                                                .textTheme
+                                                .bodySmall,
+                                          ),
+                                          groupValue: payment,
+                                          onChanged: (value) {
+                                            payment = value!;
+                                            context
+                                                .read<RadioProvider>()
+                                                .changeRadion(value);
+                                          }),
+                                    ),
+                                    SizedBox(
+                                      height: 50,
+                                      width: size.width * 0.3,
+                                      child: RadioListTile(
+                                          selected: radio.value == 'Card',
+                                          title: AppText(
+                                            text: 'Card',
+                                            textStyle: Theme.of(context)
+                                                .textTheme
+                                                .bodySmall,
+                                          ),
+                                          value: 'Card',
+                                          groupValue: payment,
+                                          onChanged: (value) {
+                                            payment = value!;
+                                            context
+                                                .read<RadioProvider>()
+                                                .changeRadion(value);
+                                          }),
+                                    ),
+                                    SizedBox(
+                                      height: 50,
+                                      width: size.width * 0.3,
+                                      child: RadioListTile(
+                                          selected: radio.value == 'UPI',
+                                          title: AppText(
+                                            text: 'UPI',
+                                            textStyle: Theme.of(context)
+                                                .textTheme
+                                                .bodySmall,
+                                          ),
+                                          value: 'UPI',
+                                          groupValue: payment,
+                                          onChanged: (value) {
+                                            payment = value!;
+                                            context
+                                                .read<RadioProvider>()
+                                                .changeRadion(value);
+                                          }),
+                                    ),
+                                  ],
+                                );
+                              }),
+                            ),
+                            const SizedBox(
+                              height: 5,
+                            ),
+                            AppText(
                                 text: 'Advance Amount',
                                 textStyle:
                                     Theme.of(context).textTheme.titleSmall),
@@ -415,14 +525,109 @@ class _AddPatientScreenState extends State<AddPatientScreen> {
                             ),
                             ElevatedButton(
                                 onPressed: () {
-                                  if (formKey.currentState!.validate()) {}
+                                  if (patient.selectedTreatment.isEmpty) {
+                                    showDialog(
+                                        context: context,
+                                        builder: (context) => AlertDialog(
+                                              title: Center(
+                                                child: AppText(
+                                                    text: 'Check it Out',
+                                                    textColor:
+                                                        ColorPallete.themeColor,
+                                                    textStyle: Theme.of(context)
+                                                        .textTheme
+                                                        .titleMedium),
+                                              ),
+                                              content: AppText(
+                                                  text:
+                                                      'Please select atleast one treatment ',
+                                                  textStyle: Theme.of(context)
+                                                      .textTheme
+                                                      .bodySmall),
+                                              actions: [
+                                                GestureDetector(
+                                                  onTap: () {
+                                                    Navigator.pop(context);
+                                                  },
+                                                  child: AppText(
+                                                    text: 'Cancel',
+                                                    textStyle: Theme.of(context)
+                                                        .textTheme
+                                                        .bodySmall,
+                                                    textColor:
+                                                        ColorPallete.errorColor,
+                                                  ),
+                                                )
+                                              ],
+                                            ));
+                                  } else if (formKey.currentState!.validate()) {
+                                    context
+                                        .read<RegisterPatientViewModel>()
+                                        .registerPatient(
+                                            name: usernameController.text,
+                                            executive: "test_user",
+                                            payment: payment,
+                                            phone: phoneController.text,
+                                            address: addressController.text,
+                                            totalAmount: double.parse(
+                                                totalAmountController.text),
+                                            discountAmount: double.parse(
+                                                discountAmountController.text),
+                                            advanceAmount: double.parse(
+                                                advanceAmountController.text),
+                                            balanceAmount: double.parse(
+                                                balanceAmountController.text),
+                                            dateTime: getDateTime(
+                                                selectedDate!,
+                                                int.parse(selectedHour!),
+                                                int.parse(selectedMinute!)),
+                                            male: patient.selectedTreatment
+                                                .map(
+                                                    (data) => data.treatment.id)
+                                                .toList(),
+                                            female: patient.selectedTreatment
+                                                .map(
+                                                    (data) => data.treatment.id)
+                                                .toList(),
+                                            treatments: patient
+                                                .selectedTreatment
+                                                .map((data) => data.treatment.id)
+                                                .toList(),
+                                            branch: getBranch(selectedBranches!))
+                                        .then((value) {
+                                      if (patient.isError == true &&
+                                          patient.isLoading == false) {
+                                        ScaffoldMessenger.of(context)
+                                          ..hideCurrentSnackBar()
+                                          ..showSnackBar(SnackBar(
+                                              content: AppText(
+                                            text: patient.error ?? "",
+                                            textStyle: Theme.of(context)
+                                                .textTheme
+                                                .bodySmall,
+                                            textColor: ColorPallete.whiteColor,
+                                          )));
+                                      } else {
+                                        Navigator.pushNamedAndRemoveUntil(
+                                            context,
+                                            Routers.homeScreen,
+                                            (listen) => false);
+                                      }
+                                    });
+                                    ;
+                                  }
                                 },
-                                child: AppText(
-                                  text: 'Save',
-                                  textStyle:
-                                      Theme.of(context).textTheme.titleMedium,
-                                  textColor: ColorPallete.whiteColor,
-                                ))
+                                child: patient.isLoading == true
+                                    ? const CircularProgressIndicator(
+                                        color: ColorPallete.whiteColor,
+                                      )
+                                    : AppText(
+                                        text: 'Save',
+                                        textStyle: Theme.of(context)
+                                            .textTheme
+                                            .titleMedium,
+                                        textColor: ColorPallete.whiteColor,
+                                      ))
                           ],
                         ),
                       ),
