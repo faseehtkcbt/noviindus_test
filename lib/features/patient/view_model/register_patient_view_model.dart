@@ -1,6 +1,20 @@
 import 'package:flutter/material.dart';
 
-class RegisterPatientViewModel extends ChangeNotifier{
+import '../model/treatment_data.dart';
 
-  List<int>treatment = [];
+class RegisterPatientViewModel extends ChangeNotifier {
+  List<TreatmentData> _selectedTreatment = [];
+
+  List<TreatmentData> get selectedTreatment => _selectedTreatment;
+
+  void addSelectedTreatment(TreatmentData data) {
+    _selectedTreatment.add(data);
+    notifyListeners();
+  }
+
+  void removeSelectedTreatment(TreatmentData data) {
+    _selectedTreatment
+        .removeWhere((e) => e.treatment.name == data.treatment.name);
+    notifyListeners();
+  }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:noviindus_test/config/routers/routers.dart';
 import 'package:noviindus_test/core/color_pallette/color_pallete.dart';
 import 'package:noviindus_test/core/utils/app_text.dart';
+import 'package:noviindus_test/core/utils/app_text_form.dart';
 import 'package:noviindus_test/features/home/view/widgets/patient_card.dart';
 import 'package:noviindus_test/features/home/view_model/home_view_model.dart';
 import 'package:provider/provider.dart';
@@ -14,6 +15,7 @@ class Homescreen extends StatefulWidget {
 }
 
 class _HomescreenState extends State<Homescreen> {
+  final searchController = TextEditingController();
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -52,16 +54,49 @@ class _HomescreenState extends State<Homescreen> {
       ),
       body: Center(
           child: RefreshIndicator(
-            onRefresh: () async{
-              return await context.read<HomeViewModel>().getPatients();
-            },
-            child: Container(
-                    height: size.height,
-                    width: size.width,
-                    child: Column(
+        onRefresh: () async {
+          return await context.read<HomeViewModel>().getPatients();
+        },
+        child: Container(
+          height: size.height,
+          width: size.width,
+          child: Column(
             children: [
               Padding(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.only(
+                    top: 5, left: 20, right: 20, bottom: 5),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    SizedBox(
+                      height: 40,
+                      width: size.width * 0.6,
+                      child: AppTextFormField(
+                        controller: searchController,
+                        hintText: 'Search by name',
+                        suffixIcon: const Icon(
+                          Icons.search,
+                          size: 18,
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 40,
+                      width: size.width * 0.25,
+                      child: ElevatedButton(
+                          onPressed: () {},
+                          child: AppText(
+                              text: 'Search',
+                              textColor: ColorPallete.whiteColor,
+                              textStyle:
+                                  Theme.of(context).textTheme.bodySmall)),
+                    )
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(
+                    top: 5, left: 20, right: 20, bottom: 5),
                 child: Row(
                   children: [
                     AppText(
@@ -77,14 +112,18 @@ class _HomescreenState extends State<Homescreen> {
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.all(20),
-                  child: Consumer<HomeViewModel>(builder: (context, home, child) {
+                  child:
+                      Consumer<HomeViewModel>(builder: (context, home, child) {
                     if (home.isLoaded == true) {
                       return ListView.separated(
                         itemCount: 10,
                         shrinkWrap: true,
                         physics: const BouncingScrollPhysics(),
                         itemBuilder: (context, index) {
-                          return PatientCard(patient: home.patients![index], index: index,);
+                          return PatientCard(
+                            patient: home.patients![index],
+                            index: index,
+                          );
                         },
                         separatorBuilder: (BuildContext context, int index) {
                           return const SizedBox(
@@ -93,20 +132,20 @@ class _HomescreenState extends State<Homescreen> {
                         },
                       );
                     } else if (home.isError == true) {
-                      WidgetsBinding.instance.addPostFrameCallback((_){
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
                         ScaffoldMessenger.of(context)
                           ..hideCurrentSnackBar()
                           ..showSnackBar(SnackBar(
                               content: AppText(
-                                  text: home.error ?? "",
-                                  textStyle:
-                                  Theme.of(context).textTheme.bodySmall,textColor: ColorPallete.whiteColor,)));
+                            text: home.error ?? "",
+                            textStyle: Theme.of(context).textTheme.bodySmall,
+                            textColor: ColorPallete.whiteColor,
+                          )));
                       });
                       return AppText(
                           text: 'Something Went Wrong',
                           textStyle: Theme.of(context).textTheme.bodyMedium);
-                    }
-                    else{
+                    } else {
                       return const Center(
                         child: CircularProgressIndicator(
                           color: ColorPallete.themeColor,
@@ -117,9 +156,9 @@ class _HomescreenState extends State<Homescreen> {
                 ),
               )
             ],
-                    ),
-                  ),
-          )),
+          ),
+        ),
+      )),
     );
   }
 }
