@@ -51,70 +51,75 @@ class _HomescreenState extends State<Homescreen> {
             )),
       ),
       body: Center(
-          child: Container(
-        height: size.height,
-        width: size.width,
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(20),
-              child: Row(
-                children: [
-                  AppText(
-                      text: 'Sort By:',
-                      textStyle: Theme.of(context).textTheme.titleSmall),
-                ],
-              ),
-            ),
-            const Divider(
-              height: 3,
-              color: ColorPallete.borderColor,
-            ),
-            Expanded(
-              child: Padding(
+          child: RefreshIndicator(
+            onRefresh: () async{
+              return await context.read<HomeViewModel>().getPatients();
+            },
+            child: Container(
+                    height: size.height,
+                    width: size.width,
+                    child: Column(
+            children: [
+              Padding(
                 padding: const EdgeInsets.all(20),
-                child: Consumer<HomeViewModel>(builder: (context, home, child) {
-                  if (home.isLoaded == true) {
-                    return ListView.separated(
-                      itemCount: 10,
-                      shrinkWrap: true,
-                      physics: const BouncingScrollPhysics(),
-                      itemBuilder: (context, index) {
-                        return PatientCard(patient: home.patients![index], index: index,);
-                      },
-                      separatorBuilder: (BuildContext context, int index) {
-                        return const SizedBox(
-                          height: 10,
-                        );
-                      },
-                    );
-                  } else if (home.isError == true) {
-                    WidgetsBinding.instance.addPostFrameCallback((_){
-                      ScaffoldMessenger.of(context)
-                        ..hideCurrentSnackBar()
-                        ..showSnackBar(SnackBar(
-                            content: AppText(
-                                text: home.error ?? "",
-                                textStyle:
-                                Theme.of(context).textTheme.bodySmall,textColor: ColorPallete.whiteColor,)));
-                    });
-                    return AppText(
-                        text: 'Something Went Wrong',
-                        textStyle: Theme.of(context).textTheme.bodyMedium);
-                  }
-                  else{
-                    return const Center(
-                      child: CircularProgressIndicator(
-                        color: ColorPallete.themeColor,
-                      ),
-                    );
-                  }
-                }),
+                child: Row(
+                  children: [
+                    AppText(
+                        text: 'Sort By:',
+                        textStyle: Theme.of(context).textTheme.titleSmall),
+                  ],
+                ),
               ),
-            )
-          ],
-        ),
-      )),
+              const Divider(
+                height: 3,
+                color: ColorPallete.borderColor,
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Consumer<HomeViewModel>(builder: (context, home, child) {
+                    if (home.isLoaded == true) {
+                      return ListView.separated(
+                        itemCount: 10,
+                        shrinkWrap: true,
+                        physics: const BouncingScrollPhysics(),
+                        itemBuilder: (context, index) {
+                          return PatientCard(patient: home.patients![index], index: index,);
+                        },
+                        separatorBuilder: (BuildContext context, int index) {
+                          return const SizedBox(
+                            height: 10,
+                          );
+                        },
+                      );
+                    } else if (home.isError == true) {
+                      WidgetsBinding.instance.addPostFrameCallback((_){
+                        ScaffoldMessenger.of(context)
+                          ..hideCurrentSnackBar()
+                          ..showSnackBar(SnackBar(
+                              content: AppText(
+                                  text: home.error ?? "",
+                                  textStyle:
+                                  Theme.of(context).textTheme.bodySmall,textColor: ColorPallete.whiteColor,)));
+                      });
+                      return AppText(
+                          text: 'Something Went Wrong',
+                          textStyle: Theme.of(context).textTheme.bodyMedium);
+                    }
+                    else{
+                      return const Center(
+                        child: CircularProgressIndicator(
+                          color: ColorPallete.themeColor,
+                        ),
+                      );
+                    }
+                  }),
+                ),
+              )
+            ],
+                    ),
+                  ),
+          )),
     );
   }
 }

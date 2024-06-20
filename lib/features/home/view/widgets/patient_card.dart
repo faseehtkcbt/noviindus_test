@@ -17,9 +17,8 @@ class _PatientCardState extends State<PatientCard> {
   List<String> treatments = [];
   @override
   void initState() {
-    widget.patient.patientDetailsSet?.map((e) =>z treatments.add(e.treatment.toString()));
+    widget.patient.patientDetailsSet?.map((e) => treatments.add(e.treatment.toString()));
     // TODO: implement initState
-    print(treatments);
     super.initState();
   }
   @override

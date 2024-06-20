@@ -10,6 +10,7 @@ class AppTextFormField extends StatefulWidget {
   final Widget? suffixIcon;
   String? Function(String?)? validator;
   void Function(String)? onChanged;
+  void Function()? onPressed;
   void Function(String)? onFieldSubmitted;
   Pattern? filterPattern;
   final int maxLines;
@@ -27,6 +28,7 @@ class AppTextFormField extends StatefulWidget {
       this.onFieldSubmitted,
       this.autovalidateMode = AutovalidateMode.disabled,
       this.filterPattern,
+      this.onPressed,
       this.maxLines = 1,
       this.isObscure = false,
       this.readOnly = false});
@@ -49,6 +51,7 @@ class _AppTextFormFieldState extends State<AppTextFormField> {
       textCapitalization: widget.textCapitalization,
       validator: widget.validator,
       onChanged: widget.onChanged,
+      onTap: widget.onPressed,
       onFieldSubmitted: widget.onFieldSubmitted,
       autovalidateMode: widget.autovalidateMode,
       maxLines: widget.maxLines,

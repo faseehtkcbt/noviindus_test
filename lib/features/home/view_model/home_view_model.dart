@@ -19,6 +19,7 @@ class HomeViewModel extends ChangeNotifier{
 
   getPatients()async{
     _isLoading = true;
+    startLoading();
     notifyListeners();
     final response = await HomeRepository().getPatientList();
     var result ;
@@ -37,5 +38,10 @@ class HomeViewModel extends ChangeNotifier{
       _error = result;
       notifyListeners();
     }
+  }
+
+  void startLoading(){
+    _isLoaded = false;
+    _isError = false;
   }
 }

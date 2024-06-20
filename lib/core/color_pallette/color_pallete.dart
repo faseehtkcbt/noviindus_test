@@ -9,6 +9,6 @@ class ColorPallete{
   static const Color errorColor = Colors.red;
   static const Color blackColor = Colors.black;
   static const Color whiteColor = Colors.white;
-
+  static const Color lightThemeColor = Color.fromRGBO(56, 154, 72, 0.3);
 
 }

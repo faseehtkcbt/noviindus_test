@@ -8,7 +8,6 @@ class AuthLocalRepo {
     sharedpref.setString('token', response.token);
     sharedpref.setString('username', response.userDetails.username);
     sharedpref.setString('email', response.userDetails.mail);
-    print('addData');
   }
 
   Future<bool> checkIsLogged() async {
